@@ -18,8 +18,13 @@ namespace PluginInterfaces
     {
 
     }
-    interface Plugin
+    public struct FiedDetail
     {
-        void FeedDatabaseInfo(Dictionary<string, string[]> fieldMap);
+        string name;
+        List<string> fieldItems;
+    }
+    public interface IPlugin
+    {
+        string GetNeededInfoDescription();
     }
 }
