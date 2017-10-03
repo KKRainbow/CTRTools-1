@@ -46,12 +46,14 @@ namespace PluginInterfaces
     public struct Field
     {
         public string name;
+        public string desc;
+        public int index;
         public IReadOnlyCollection<FieldItem> items;
     }
     public interface IPVAutomation
     {
-        List<string> GetFieldList();
-        List<string> GetFieldItemList(int fieldIdx);
+        List<Field> GetFieldList();
+        void FillFieldItemList(Field field);
 
         /*
          * {

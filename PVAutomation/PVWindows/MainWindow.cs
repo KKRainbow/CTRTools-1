@@ -23,6 +23,8 @@ namespace PVAutomation.PVWindows
         private Dictionary<string, wi.WindowItems.Window> prefixWindowMap = new Dictionary<string, wi.WindowItems.Window>();
 
         const int MaxWheel = 267;
+
+        string dbFolder;
         public MainWindow(string name = "Powrvw-V")
         {
             var pvProc = Process.GetProcessesByName("Powrvw-V");
@@ -35,14 +37,12 @@ namespace PVAutomation.PVWindows
             appProcess = pvProc[0];
 
             config = new PVConfig(appProcess.StartInfo.FileName);
-            var dbFolder = config.Get(PVConfig.Keys.DatabaseFolder);
+            dbFolder = config.Get(PVConfig.Keys.DatabaseFolder);
 
             if (dbFolder == null || !File.Exists(dbFolder))
             {
                 throw new Exception("Cannot get db folder of " + dbFolder);
             }
-
-            Window.Title;
         }
         ~MainWindow()
         {
@@ -271,7 +271,7 @@ namespace PVAutomation.PVWindows
             {
                 return;
             }
-            var headers = FieldFile.GetFieldFile(field.fieldName, databaseDir).ReadFieldHeaders();
+            var headers = FieldFile.GetFieldFile(field.fieldName, dbFolder).ReadFieldHeaders();
             var indices = headers
                           .Select((item, index) => new { item.name, index })
                           .Where(pair => { return field.fieldItems.Contains(pair.name); })

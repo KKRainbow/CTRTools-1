@@ -119,13 +119,26 @@ namespace GeneratorPlugins.GuangMingRegularQuarterlyReports
         {
             JArray form = new JArray
             {
-                new J{
-                    "name"= "fdjksl",
+                new JObject {
+                    { "type", (int)InfoType.Field },
+                    {"description", "要跑得失的地区" },
+                    {"name", "district" }
                 },
-                new JObject{
 
+                new JObject {
+                    { "type", (int)InfoType.FieldItems },
+                    {"description", "做分析的品牌" },
+                    {"name", "brands" }
+                },
+
+                new JObject {
+                    { "type", (int)InfoType.File },
+                    {"description", "输出文件" },
+                    {"filter", "*.xslx" },
+                    {"name", "output" }
                 },
             };
+            return form.ToString();
         }
     }
 }
