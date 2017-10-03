@@ -20,6 +20,34 @@ namespace PluginInterfaces
         string name;
         Dictionary<TableType, string> matrixFile;
     }
+
+    public class FieldItem
+    {
+        private FieldItem root = new FieldItem
+        {
+            children = new List<FieldItem>(),
+            name = "field item root",
+            index = -1,
+            level = -1,
+        };
+        public FieldItem Root
+        {
+            get
+            {
+                return root;
+            }
+        }
+        public int level;
+        public string name;
+        public int index;
+        public IReadOnlyCollection<FieldItem> children;
+        public FieldItem parent;
+    }
+    public struct Field
+    {
+        public string name;
+        public IReadOnlyCollection<FieldItem> items;
+    }
     public interface IPVAutomation
     {
         List<string> GetFieldList();
@@ -34,6 +62,7 @@ namespace PluginInterfaces
          * }
          */
         SavedTable CalcTable(string tableSpecJson);
+        IMatrixFileReader GetMatrixReader(string name);
     }
 
     public interface IMatrixFileReader
