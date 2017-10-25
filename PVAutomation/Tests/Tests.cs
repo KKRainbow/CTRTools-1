@@ -16,8 +16,7 @@ namespace PVAutomation.Tests
         {
             //return;
             var fieldData = FieldFile.GetFieldFile("REP30040", DatabaseDir);
-            ActivateWindow();
-            SwitchTableSpec spec = new SwitchTableSpec
+            SwitchSpec spec = new SwitchSpec
             {
                 demographicField = new FieldDetail()
                 {
@@ -30,7 +29,7 @@ namespace PVAutomation.Tests
                 period1Field = new FieldDetail()
                 {
                     fieldName = "W_PERIOD",
-                    fieldItems = new SortedSet<string>((from header in PVData.GetDataFileOfField("W_PERIOD", databaseDir).ReadFieldHeaders()
+                    fieldItems = new SortedSet<string>((from header in FieldFile.GetFieldFile("W_PERIOD", DatabaseDir).ReadFieldHeaders()
                                                         select header.name).Skip(1).ToList())
                 },
                 dataFilter = new FieldDetail()
@@ -58,9 +57,6 @@ namespace PVAutomation.Tests
                 periodLength = 13,
                 waveInterval = 13,
             };
-            RunSwitchTableSpec(spec);
-            ExecuteSwitchSpec();
-            SaveSwitchSpec("123", "");
         }
     }
 }

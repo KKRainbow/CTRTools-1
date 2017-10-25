@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26730.16
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PVAutomation", "PVAutomation\PVAutomation.csproj", "{EC214CA3-0A39-42A6-9F6F-F8917E3EB14C}"
 EndProject
@@ -29,6 +29,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{32C11004-239E-4ECC-820D-8BAF1253276D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginTests", "PluginTests\PluginTests.csproj", "{49CFD772-37A7-4C9D-A940-7F29FFD9A473}"
+	ProjectSection(ProjectDependencies) = postProject
+		{105AB71C-856C-4A46-96A4-1D61E9358F66} = {105AB71C-856C-4A46-96A4-1D61E9358F66}
+		{E6E6DF3A-029B-4510-B986-6FD9E1841838} = {E6E6DF3A-029B-4510-B986-6FD9E1841838}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -98,8 +98,14 @@ namespace PVAutomation.PVFields
             this.filename = filename;
             binStream = new BinaryReader(new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read));
         }
+
+        static Dictionary<string, FieldFile> fieldFileCache = new Dictionary<string, FieldFile>();
         public static FieldFile GetFieldFile(string name, string directory)
         {
+            if (fieldFileCache.ContainsKey(name))
+            {
+                return fieldFileCache[name];
+            }
             var files = Directory.GetFiles(directory, name + "*", SearchOption.AllDirectories);
             foreach (var file in files)
             {
@@ -112,6 +118,7 @@ namespace PVAutomation.PVFields
                 {
                     var d = new FieldFile(file);
                     d.ReadHeader();
+                    fieldFileCache[name] = d;
                     return d;
                 }
                 catch (NotDataFileException)
@@ -119,6 +126,7 @@ namespace PVAutomation.PVFields
                     continue;
                 }
             }
+            fieldFileCache[name] = null;
             return null;
         }
     }

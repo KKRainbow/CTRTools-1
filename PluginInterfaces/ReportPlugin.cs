@@ -6,29 +6,22 @@ using System.Threading.Tasks;
 
 namespace PluginInterfaces
 {
-    public enum InfoType
+    public class FieldDetail
     {
-        Field, //Need specify a field
-        FieldItems, //Need to specify a field with selected items
-        FieldItemsAlias, //Need to specify a field with selected items and alias
-        Integer, //Need a int number
-        Float, //Need a float number
-        File, //A file path
-        Directory, //A directory path
-    }
-    class NeededInfo
-    {
-        public InfoType type;
-    }
-    public struct FiedDetail
-    {
-        string name;
-        List<string> fieldItems;
+        public string name;
+        public List<int> fieldItems = new List<int>();
     }
 
     public interface IPlugin
     {
         string GetNeededInfoDescription();
-        void RunWithNeededInfo(string neededInfoJson, IPVAutomation pv);
+        string GetTablesToExecute(string neededInfoJson);
+    }
+
+    public interface IPluginMetadata
+    {
+        string Name { get; }
+        string Description { get; }
+        string Period { get; }
     }
 }

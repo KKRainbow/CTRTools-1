@@ -23,37 +23,25 @@ namespace PluginInterfaces
 
     public class FieldItem
     {
-        private FieldItem root = new FieldItem
-        {
-            children = new List<FieldItem>(),
-            name = "field item root",
-            index = -1,
-            level = -1,
-        };
-        public FieldItem Root
-        {
-            get
-            {
-                return root;
-            }
-        }
         public int level;
         public string name;
         public int index;
         public IReadOnlyCollection<FieldItem> children;
         public FieldItem parent;
     }
-    public struct Field
+    public class Field
     {
         public string name;
         public string desc;
         public int index;
+
         public IReadOnlyCollection<FieldItem> items;
+        public FieldItem root;
     }
     public interface IPVAutomation
     {
         List<Field> GetFieldList();
-        void FillFieldItemList(Field field);
+        Field FillFieldItemList(Field field);
 
         /*
          * {

@@ -1,10 +1,11 @@
-﻿using Newtonsoft.Json.Linq;
-using PluginInterfaces;
+﻿using PluginInterfaces;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using PluginInterfaces.TableSpecs;
+using Newtonsoft.Json;
+using PluginInterfaces.Forms;
 
 namespace GeneratorPlugins.GuangMingRegularQuarterlyReports
 {
@@ -19,9 +20,16 @@ namespace GeneratorPlugins.GuangMingRegularQuarterlyReports
             "购买清单中增加/删除品牌", "新增/流失品类消费者" };
     }
 
+    [Export(typeof(IPlugin))]
+    [ExportMetadata("Name", "光明得失报告生成")]
+    [ExportMetadata("Description", "生成光明各个地区、品牌的得失报告PPT，并插入最终PPT的对应位置")]
+    [ExportMetadata("Period", "季度")]
     public class Plugin : IPlugin
     {
-        private Dictionary<List<int>, List<int>> SelectBrands(Field brandField,ICollection<int> brandIndices)
+        [Import]
+        IPVAutomation pv { get; set; }
+
+        private List<SortedDictionary<string, List<int>>> SelectBrands(Field brandField, ICollection<int> brandIndices)
         {
             var fields = brandField.items;
             //classify indices by parent
@@ -99,7 +107,7 @@ namespace GeneratorPlugins.GuangMingRegularQuarterlyReports
             };
 
 
-            Dictionary<List<int>, List<int>> result = new Dictionary<List<int>, List<int>>();
+            List<SortedDictionary<string, List<int>>> result = new List<SortedDictionary<string, List<int>>>();
             foreach (var k in UnionSet)
             {
                 var currParent = fields.ElementAt(k[0]).parent;
@@ -111,34 +119,78 @@ namespace GeneratorPlugins.GuangMingRegularQuarterlyReports
                     currChildren = new List<int> { currParent.index };
                     currParent = currParent.parent;
                 }
-                result.Add(others.Concat(k).OrderBy(x => x).ToList(), k);
+                result.Add(new SortedDictionary<string, List<int>>
+                {
+                    { "comparisons", new List<int>(others.Concat(k).OrderBy(x => x).ToList()) },
+                    { "brands", new List<int>(k) },
+                });
             }
             return result;
         }
         public string GetNeededInfoDescription()
         {
-            JArray form = new JArray
+            List<FormItemBase> forms = new List<FormItemBase>
             {
-                new JObject {
-                    { "type", (int)InfoType.Field },
-                    {"description", "要跑得失的地区" },
-                    {"name", "district" }
+                new FieldItems
+                {
+                    name = "disrict",
+                    description = "要跑得失的地区" ,
                 },
-
-                new JObject {
-                    { "type", (int)InfoType.FieldItems },
-                    {"description", "做分析的品牌" },
-                    {"name", "brands" }
+                new FieldItems
+                {
+                    name = "brands",
+                    description = "做分析的品牌",
                 },
-
-                new JObject {
-                    { "type", (int)InfoType.File },
-                    {"description", "输出文件" },
-                    {"filter", "*.xslx" },
-                    {"name", "output" }
-                },
+                new FileForm
+                {
+                    name = "output",
+                    description = "输出文件",
+                    filter = "Excel文件(*.xlsx)|*.xlsx",
+                    isSave = true,
+                }
             };
-            return form.ToString();
+            return JsonConvert.SerializeObject(forms);
+        }
+
+        Field GetFieldByIndex(int index)
+        {
+            var list = pv.GetFieldList();
+            foreach (var f in list)
+            {
+                if (f.index == index)
+                {
+                    return pv.FillFieldItemList(f);
+                }
+            }
+            return null;
+        }
+
+        public string GetTablesToExecute(string neededInfoJson)
+        {
+            var info = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, object>>>(neededInfoJson);
+            // Partition the brands
+            var brandsField = (Int64)info["brands"]["field"];
+            var brandsList = ((Newtonsoft.Json.Linq.JArray)info["brands"]["fieldItems"]).ToObject<List<int>>() ;
+
+            var b = SelectBrands(GetFieldByIndex((int)brandsField), brandsList);
+
+            
+
+            // Construct Spec
+            SwitchSpec spec = new SwitchSpec
+            {
+                brands = 
+                {
+                    name = "abc",
+                    fieldItems = {1,2,3,4,5 }
+                },
+                period1Field =
+                {
+                    name = null,
+                    fieldItems = {3,4,5,6 }
+                }
+            };
+            return JsonConvert.SerializeObject(b);
         }
     }
 }

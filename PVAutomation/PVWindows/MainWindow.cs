@@ -25,6 +25,17 @@ namespace PVAutomation.PVWindows
         const int MaxWheel = 267;
 
         string dbFolder;
+
+        IEnumerable<Database> dataBases; //<name, path>
+        Database currDatabase;
+
+        public Database CurrDatabase
+        {
+            get
+            {
+                return currDatabase;
+            }
+        }
         public MainWindow(string name = "Powrvw-V")
         {
             var pvProc = Process.GetProcessesByName("Powrvw-V");
@@ -36,17 +47,36 @@ namespace PVAutomation.PVWindows
             app = w.Application.Attach(pvProc[0]);
             appProcess = pvProc[0];
 
-            config = new PVConfig(appProcess.StartInfo.FileName);
+            config = new PVConfig(appProcess.MainModule.FileName);
             dbFolder = config.Get(PVConfig.Keys.DatabaseFolder);
 
-            if (dbFolder == null || !File.Exists(dbFolder))
+            if (dbFolder == null || !Directory.Exists(dbFolder))
             {
                 throw new Exception("Cannot get db folder of " + dbFolder);
             }
+
+            dataBases = GetDataBases(dbFolder);
+
+            var t = Window.Title.Split(new string[] { " - " }, StringSplitOptions.None);
+            try
+            {
+                currDatabase = (from db in dataBases
+                                where db.name == t[1] && db.description == t[2]
+                                select db).ToList()[0];
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                throw new Exception("Cannot determine current database");
+            }
+        }
+
+        static IEnumerable<Database> GetDataBases(string dbFolder)
+        {
+            return from file in Directory.GetFiles(dbFolder, "*.GLB", SearchOption.AllDirectories)
+                   select Database.ParseFromFile(file);
         }
         ~MainWindow()
         {
-            app.Dispose();
         }
         private wi.WindowItems.Window Window
         {
@@ -125,7 +155,7 @@ namespace PVAutomation.PVWindows
         public IEnumerable<string> GetFieldItemsOfSelectedField()
         {
             var fn = FieldListBox.SelectedItemText;
-            var fdata = FieldFile.GetFieldFile(fn, databaseDir);
+            var fdata = FieldFile.GetFieldFile(fn, currDatabase.folder);
             var ds = fdata.ReadFieldHeaders();
             return from d in ds select d.name;
         }

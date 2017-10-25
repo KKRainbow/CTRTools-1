@@ -22,7 +22,7 @@ namespace PVAutomation.PVWindows
                 return mainWindow.FindWindowByNamePrefix("Switch Spec");
             }
         }
-        private bool SaveSwitchSpec(string name, string description)
+        public bool SaveSwitchSpec(string name, string description)
         {
             if (name.Length > 8 || name.Length < 1)
             {
@@ -61,7 +61,7 @@ namespace PVAutomation.PVWindows
             });
             return result;
         }
-        public void HandlePenetrationCorrectionOptions(wi.WindowItems.Window win, PenetrationCorrectionOptions op = PenetrationCorrectionOptions.None)
+        private void HandlePenetrationCorrectionOptions(wi.WindowItems.Window win, PenetrationCorrectionOptions op = PenetrationCorrectionOptions.None)
         {
             const string title = "Penetration Correction Options";
             if (win.Title != title)
@@ -73,7 +73,7 @@ namespace PVAutomation.PVWindows
                 win.Get<wi.ListBoxItems.ListBox>(wi.Finders.SearchCriteria.ByControlType(ControlType.List)).Select((int)op);
             }
         }
-        public void HandleWeightedFieldsSpec(wi.WindowItems.Window win)
+        private void HandleWeightedFieldsSpec(wi.WindowItems.Window win)
         {
             const string title = "Weighted Fields Specification";
             if (win.Title != title)
@@ -91,7 +91,7 @@ namespace PVAutomation.PVWindows
             }
             Console.WriteLine("Execution complete");
         }
-        private void ExecuteSwitchSpec()
+        public void ExecuteSwitchSpec()
         {
             ExecuteButton.Click();
             for (int i = 0; i < 2; i++)
@@ -142,7 +142,7 @@ namespace PVAutomation.PVWindows
                 return true;
             });
         }
-        private void SetSpec(SwitchSpec spec)
+        public void SetSpec(SwitchSpec spec)
         {
             ClearSwitchingAnalysisSpec();
             RollingGainLossCheckBox.Checked = spec.isRolling;
